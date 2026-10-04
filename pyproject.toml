@@ -5,14 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "qbo-airbyte-token-rotator"
 version = "0.1.0"
-description = "Keep an Airbyte Cloud QuickBooks Online source alive by rotating Intuit's rolling refresh token through Google Secret Manager."
+description = "Keep an Airbyte Cloud QuickBooks Online source alive by rotating Intuit's rolling refresh token through a cloud secret store (GCP, AWS or Azure)."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "galwyn" }]
 requires-python = ">=3.9"
 dependencies = [
     "requests>=2.28",
-    "google-cloud-secret-manager>=2.16",
 ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
@@ -21,7 +20,10 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=7"]
+gcp = ["google-cloud-secret-manager>=2.16"]
+aws = ["boto3>=1.28"]
+azure = ["azure-keyvault-secrets>=4.7", "azure-identity>=1.15"]
+test = ["pytest>=7", "google-cloud-secret-manager>=2.16"]
 
 [project.urls]
 Homepage = "https://github.com/galwyn/qbo-airbyte-token-rotator"

@@ -38,7 +38,7 @@ def test_package_imports():
     assert callable(qbo_airbyte_token_rotator.main)
 
 
-@patch("qbo_airbyte_token_rotator.rotator.secretmanager.SecretManagerServiceClient")
+@patch("google.cloud.secretmanager.SecretManagerServiceClient")
 @patch("qbo_airbyte_token_rotator.rotator.requests")
 def test_full_rotation_from_env_vars(mock_requests, mock_sm_client):
     sm = mock_sm_client.return_value
@@ -82,7 +82,7 @@ def test_full_rotation_from_env_vars(mock_requests, mock_sm_client):
     assert patched["start_date"] == "2020-01-01"
 
 
-@patch("qbo_airbyte_token_rotator.rotator.secretmanager.SecretManagerServiceClient")
+@patch("google.cloud.secretmanager.SecretManagerServiceClient")
 @patch("qbo_airbyte_token_rotator.rotator.requests")
 def test_identical_refresh_token_is_not_rewritten(mock_requests, mock_sm_client):
     sm = mock_sm_client.return_value
@@ -100,7 +100,7 @@ def test_identical_refresh_token_is_not_rewritten(mock_requests, mock_sm_client)
     sm.add_secret_version.assert_not_called()
 
 
-@patch("qbo_airbyte_token_rotator.rotator.secretmanager.SecretManagerServiceClient")
+@patch("google.cloud.secretmanager.SecretManagerServiceClient")
 def test_client_secrets_are_read_from_named_secrets(mock_sm_client):
     values = {
         "projects/example-project/secrets/ab-secret/versions/latest": "ab-value",
