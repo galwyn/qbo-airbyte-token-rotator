@@ -25,9 +25,20 @@ The cost is that **each sync must start and finish within one hour of a rotation
 
 Making Airbyte renew access tokens itself would remove the one-hour window. But Airbyte might then receive a new refresh token from Intuit that the secret store never sees, and the next rotation would push a stale one back. That trade hasn't been tested, so the tool doesn't make it.
 
+## Connector version
+
+The tool needs `airbyte/source-quickbooks` **4.0.0 or later**. It has been run against the 4.x line on Airbyte Cloud, and 4.2.0 is the latest version at the time of writing.
+
+Version 4.0.0 moved the credential fields (`client_id`, `client_secret`, `refresh_token`, `access_token`, `token_expiry_date`, `realm_id`) from a nested `credentials` object to the top level of the source configuration. The tool writes the top-level fields only. On a 3.x source it would report success while the connector kept reading the old token from `credentials`, and syncs would fail.
+
+To check your version, open the source in Airbyte. Its settings page shows the connector version. A source created before 4.0.0 may still hold a nested `credentials` object. Version 4.2.0 migrates it to the top level automatically at the start of a sync. On earlier 4.x versions, re-enter the credentials in the source settings before you start using the tool.
+
+The tool calls the Airbyte public API (`https://api.airbyte.com/v1`) and Intuit's OAuth 2.0 token endpoint. Neither has a version to choose.
+
 ## Requirements
 
 - An Airbyte Cloud workspace with a QuickBooks source, and an Airbyte API application (client ID and client secret) from **Settings → Applications**.
+- The Airbyte QuickBooks source connector (`airbyte/source-quickbooks`) at **version 4.0.0 or later**. See [Connector version](#connector-version).
 - An Intuit developer app (QuickBooks client ID and client secret) and the realm (company) ID of the connected company.
 - A secret store, and an identity for the job that can read the secrets and add a new version of the refresh-token secret:
 
