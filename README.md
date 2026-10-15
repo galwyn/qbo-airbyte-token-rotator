@@ -1,5 +1,7 @@
 # qbo-airbyte-token-rotator
 
+> **Only for the Airbyte QuickBooks connector 4.x.** Version 5.0.0 of `airbyte/source-quickbooks`, released in October 2026, refreshes the access token and stores each new refresh token in the source configuration by itself. On 5.0.0 or later you don't need this tool, and you shouldn't run it: Airbyte warns against sharing the refresh token with another tool, because the two would retire each other's tokens. Airbyte pauses 4.x QuickBooks connections that aren't upgraded by 13 November 2026. To upgrade, edit the source, choose "Use your own Intuit app", and enter the Client ID, Client Secret, Realm ID and your current refresh token, then stop this tool's schedule before its next run.
+
 Keeps an [Airbyte Cloud](https://airbyte.com) QuickBooks Online source alive by rotating Intuit's refresh token and keeping it in a cloud secret store. Google Secret Manager is the default. AWS Secrets Manager and Azure Key Vault are also supported.
 
 ## The problem
@@ -27,7 +29,9 @@ Making Airbyte renew access tokens itself would remove the one-hour window. But 
 
 ## Connector version
 
-The tool needs `airbyte/source-quickbooks` **4.0.0 or later**. It has been run against the 4.x line on Airbyte Cloud, and 4.2.0 is the latest version at the time of writing.
+The tool needs `airbyte/source-quickbooks` **4.x: 4.0.0 or later, and earlier than 5.0.0**. It has been run against the 4.x line on Airbyte Cloud.
+
+Version 5.0.0 moves the credentials back under a nested `credentials` object and manages both tokens itself, so the tool's top-level writes no longer reach the fields the connector reads. Don't use the tool with 5.0.0 or later; see the note at the top.
 
 Version 4.0.0 moved the credential fields (`client_id`, `client_secret`, `refresh_token`, `access_token`, `token_expiry_date`, `realm_id`) from a nested `credentials` object to the top level of the source configuration. The tool writes the top-level fields only. On a 3.x source it would report success while the connector kept reading the old token from `credentials`, and syncs would fail.
 
@@ -38,7 +42,7 @@ The tool calls the Airbyte public API (`https://api.airbyte.com/v1`) and Intuit'
 ## Requirements
 
 - An Airbyte Cloud workspace with a QuickBooks source, and an Airbyte API application (client ID and client secret) from **Settings → Applications**.
-- The Airbyte QuickBooks source connector (`airbyte/source-quickbooks`) at **version 4.0.0 or later**. See [Connector version](#connector-version).
+- The Airbyte QuickBooks source connector (`airbyte/source-quickbooks`) at **a 4.x version** (4.0.0 or later, earlier than 5.0.0). See [Connector version](#connector-version).
 - An Intuit developer app (QuickBooks client ID and client secret) and the realm (company) ID of the connected company.
 - A secret store, and an identity for the job that can read the secrets and add a new version of the refresh-token secret:
 
