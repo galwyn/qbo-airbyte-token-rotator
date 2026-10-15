@@ -1,5 +1,9 @@
 # qbo-airbyte-token-rotator
 
+> **Notice: you probably don't need this tool any more.** Airbyte's QuickBooks connector (`airbyte/source-quickbooks`) version 5.0.0 refreshes the access and refresh tokens itself and saves each new refresh token in the source configuration. On 5.0.0 or later, don't run this tool: the connector and the tool would both hold the same rolling refresh token, and whichever uses it second breaks the chain.
+>
+> This tool is only useful for sources still on connector 4.x, for example self-managed Airbyte pinned to an older version. Airbyte Cloud disables 4.x QuickBooks connections after 13 November 2026. To move to 5.0.0, edit the source, choose **Use your own Intuit app**, enter your Client ID, Client Secret, current Refresh Token and Realm ID, and stop this tool's schedule first.
+
 Keeps an [Airbyte Cloud](https://airbyte.com) QuickBooks Online source alive by rotating Intuit's refresh token and keeping it in a cloud secret store. Google Secret Manager is the default. AWS Secrets Manager and Azure Key Vault are also supported.
 
 ## The problem
